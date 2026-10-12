@@ -21,7 +21,7 @@ export function MarketStrip({ markets, status, watchlist, toggleWatch, widgetFai
   const bankOfCanada = markets.find(market => market.provider.toLowerCase().includes('bank of canada'));
   return <section className="market-section" aria-labelledby="markets-title">
     <div className="section-heading"><div><p className="eyebrow">THE PULSE</p><h2 id="markets-title">Market overview</h2></div><span className="demo-label"><i /> TradingView data · delays vary by instrument</span></div>
-    <p className="market-caveat">Quote freshness depends on each instrument and exchange. TradingView does not expose a shared update timestamp here; use the widget’s source details. Its permitted US benchmarks here are the S&P 500 index CFD and US 100 (Nasdaq 100) cash CFD; the latter is not the Nasdaq Composite. This is a quick snapshot, not a charting terminal.</p>
+    <p className="market-caveat">Quote freshness depends on each instrument and exchange. TradingView marks delayed rows in-widget (for example, “D”); where no delay badge appears, MarketBrief still cannot independently verify real-time status or provide a timestamp. Its permitted US benchmarks here are the S&P 500 index CFD and US 100 (Nasdaq 100) cash CFD; the latter is not the Nasdaq Composite. Demo fallback values are labelled separately. This is a quick snapshot, not a charting terminal.</p>
     <TradingViewMarketData onFailure={onWidgetFailure}/>
     {bankOfCanada && <div className={`reference-quote ${bankOfCanada.mode}`}><strong>USD/CAD daily reference</strong><span>{bankOfCanada.value} CAD per USD</span><span>{bankOfCanada.mode === 'live' ? `Bank of Canada · rate date ${bankOfCanada.asOf?.slice(0, 10) ?? 'unavailable'}` : 'Demo value · not live'}</span></div>}
     {widgetFailed && <>
