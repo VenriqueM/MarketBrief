@@ -56,7 +56,7 @@ export function TradingViewIframeWidget({ kind }: { kind: EmbedKind }) {
 }
 
 const marketSectors = [
-  { sectionName: 'North American indices', symbols: ['SP:SPX', 'NASDAQ:IXIC', 'TSX:TSX'] },
+  { sectionName: 'US & Canada benchmarks', symbols: ['FOREXCOM:SPXUSD', 'FOREXCOM:NSXUSD', 'TSX:TSX'] },
   { sectionName: 'FX & commodities', symbols: ['FX:USDCAD', 'TVC:GOLD', 'TVC:USOIL'] },
   { sectionName: 'Global indices', symbols: ['INDEX:NKY', 'INDEX:DEU40', 'FOREXCOM:UKXGBP'] },
 ];

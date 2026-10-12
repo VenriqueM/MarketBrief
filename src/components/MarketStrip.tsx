@@ -2,12 +2,12 @@ import type { Market, ProviderStatus } from '../types';
 import { TradingViewMarketData } from './TradingViewWidget';
 
 const watchable = [
-  { symbol: 'SP:SPX', name: 'S&P 500' },
-  { symbol: 'NASDAQ:IXIC', name: 'Nasdaq Composite' },
-  { symbol: 'TSX:TSX', name: 'S&P/TSX Composite' },
-  { symbol: 'FX:USDCAD', name: 'USD/CAD' },
-  { symbol: 'TVC:GOLD', name: 'Gold' },
-  { symbol: 'TVC:USOIL', name: 'Crude oil' },
+  { symbol: 'SPX', name: 'S&P 500' },
+  { symbol: 'IXIC', name: 'Nasdaq 100 CFD' },
+  { symbol: 'GSPTSE', name: 'S&P/TSX Composite' },
+  { symbol: 'USDCAD', name: 'USD/CAD' },
+  { symbol: 'XAU', name: 'Gold' },
+  { symbol: 'WTI', name: 'Crude oil' },
 ];
 
 export function MarketStrip({ markets, status, watchlist, toggleWatch, widgetFailed, onWidgetFailure }: {
@@ -21,7 +21,7 @@ export function MarketStrip({ markets, status, watchlist, toggleWatch, widgetFai
   const bankOfCanada = markets.find(market => market.provider.toLowerCase().includes('bank of canada'));
   return <section className="market-section" aria-labelledby="markets-title">
     <div className="section-heading"><div><p className="eyebrow">THE PULSE</p><h2 id="markets-title">Market overview</h2></div><span className="demo-label"><i /> TradingView data · delays vary by instrument</span></div>
-    <p className="market-caveat">Quote freshness depends on each instrument and exchange. TradingView does not expose a shared update timestamp here; use the widget’s source details. This is a quick snapshot, not a charting terminal.</p>
+    <p className="market-caveat">Quote freshness depends on each instrument and exchange. TradingView does not expose a shared update timestamp here; use the widget’s source details. Its permitted US benchmarks here are the S&P 500 index CFD and US 100 (Nasdaq 100) cash CFD; the latter is not the Nasdaq Composite. This is a quick snapshot, not a charting terminal.</p>
     <TradingViewMarketData onFailure={onWidgetFailure}/>
     {bankOfCanada && <div className={`reference-quote ${bankOfCanada.mode}`}><strong>USD/CAD daily reference</strong><span>{bankOfCanada.value} CAD per USD</span><span>{bankOfCanada.mode === 'live' ? `Bank of Canada · rate date ${bankOfCanada.asOf?.slice(0, 10) ?? 'unavailable'}` : 'Demo value · not live'}</span></div>}
     {widgetFailed && <>
