@@ -710,6 +710,268 @@ a {
   color: #e2bd77;
 }
 
+.impact-toggle {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 7px;
+  margin-top: 12px;
+  padding: 6px 10px;
+  border: 1px solid #5b4a30;
+  border-radius: var(--radius-sm);
+  background: #201e19;
+  color: #e3c17c;
+  font-size: 11px;
+  font-weight: 600;
+  transition: border-color .16s ease,background-color .16s ease,color .16s ease;
+}
+
+.impact-toggle:hover,.impact-toggle.active {
+  border-color: #907348;
+  background: #28231b;
+  color: #f1d493;
+}
+
+.impact-toggle-mark {
+  display: grid;
+  width: 17px;
+  height: 17px;
+  place-items: center;
+  border: 1px solid #57472f;
+  border-radius: 50%;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.impact-toggle-label {
+  margin-left: 3px;
+  color: #a99570;
+  font-family: 'DM Mono',monospace;
+  font-size: 8px;
+  letter-spacing: .45px;
+}
+
+.market-impact-panel {
+  margin-top: 12px;
+  padding: 16px;
+  border: 1px solid #303238;
+  border-top: 2px solid #81663c;
+  border-radius: var(--radius-md);
+  background: #17191d;
+  color: #c1c5c6;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.market-impact-panel[hidden] {
+  display: none;
+}
+
+.impact-demo-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  color: #e4c17c;
+  font-family: 'DM Mono',monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: .55px;
+}
+
+.impact-demo-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--amber);
+}
+
+.impact-unavailable-banner {
+  color: #abb1b3;
+}
+
+.impact-unavailable-banner .impact-demo-dot {
+  background: #90989c;
+}
+
+.impact-disclaimer {
+  margin: 8px 0 0;
+  color: #a1a7aa;
+}
+
+.impact-block {
+  margin-top: 15px;
+  padding-top: 13px;
+  border-top: 1px solid #2b2e33;
+}
+
+.impact-block h4,.impact-scenario h4 {
+  margin: 0;
+  color: #e5e6e4;
+  font-family: Manrope,sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -.1px;
+}
+
+.impact-block>p,.impact-company>p,.impact-scenario>p,.impact-empty-company p {
+  margin: 6px 0 0;
+  color: #aeb3b5;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.impact-section-title,.impact-company-heading,.impact-classification-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 7px 12px;
+}
+
+.impact-section-title>span {
+  color: #989084;
+  font-family: 'DM Mono',monospace;
+  font-size: 8px;
+  letter-spacing: .45px;
+}
+
+.impact-empty-company {
+  margin-top: 9px;
+  padding: 10px 12px;
+  border: 1px dashed #3b3e42;
+  border-radius: var(--radius-sm);
+  background: #15171a;
+}
+
+.impact-empty-company strong {
+  color: #dedfdd;
+  font-size: 12px;
+}
+
+.impact-company-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 9px;
+}
+
+.impact-company {
+  padding: 11px 12px;
+  border: 1px solid #2d3136;
+  border-radius: var(--radius-sm);
+  background: #15171a;
+}
+
+.impact-company-heading strong {
+  color: #e7e8e5;
+  font-size: 13px;
+}
+
+.impact-ticker {
+  color: #b5a276;
+  font-family: 'DM Mono',monospace;
+  font-size: 10px;
+}
+
+.impact-classification {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 7px;
+  border: 1px solid #45484b;
+  border-radius: 999px;
+  background: #212326;
+  color: #c0c5c6;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.impact-positive {
+  border-color: #365743;
+  background: #1a241e;
+  color: #9dd0ad;
+}
+
+.impact-negative {
+  border-color: #613b35;
+  background: #271d1b;
+  color: #e2a195;
+}
+
+.impact-mixed {
+  border-color: #635334;
+  background: #252117;
+  color: #dec384;
+}
+
+.impact-uncertain {
+  border-color: #45484b;
+  color: #b8bec0;
+}
+
+.impact-classification-row p {
+  flex: 1 1 280px;
+  margin: 0;
+  color: #aeb3b5;
+  font-size: 12px;
+}
+
+.impact-relationship {
+  color: #cfbb8c !important;
+}
+
+.impact-scenarios {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 9px;
+  margin-top: 15px;
+}
+
+.impact-scenario {
+  padding: 12px;
+  border: 1px solid #31343a;
+  border-radius: var(--radius-sm);
+  background: #15171a;
+}
+
+.impact-scenario.bullish {
+  border-top: 2px solid #4c795b;
+}
+
+.impact-scenario.bearish {
+  border-top: 2px solid #875247;
+}
+
+.impact-scenario.bullish h4 {
+  color: #9dd0ad;
+}
+
+.impact-scenario.bearish h4 {
+  color: #e2a195;
+}
+
+.impact-risk-list {
+  display: grid;
+  gap: 5px;
+  margin: 8px 0 0;
+  padding-left: 18px;
+  color: #aeb3b5;
+  font-size: 12px;
+}
+
+.impact-research-link {
+  display: inline-block;
+  margin: 8px 12px 0 0;
+  color: #dfbf79;
+  font-size: 11px;
+  text-decoration: none;
+}
+
+.impact-research-link:hover {
+  color: #f0d695;
+  text-decoration: underline;
+}
+
 .note-field {
   display: block;
   margin-top: 11px;
@@ -767,7 +1029,6 @@ a {
 
 .empty-state p {
   margin: 0 0 12px;
-  color: #878e91;
   color: #a0a6aa;
   font-size: 12px;
 }
@@ -1331,6 +1592,10 @@ footer span {
     padding: 14px;
   }
 
+  .market-impact-panel {
+    padding: 13px;
+  }
+
   .tradingview-link {
     text-align: left;
   }
@@ -1409,6 +1674,18 @@ footer span {
 
   .intel-panel {
     padding: 12px;
+  }
+
+  .impact-scenarios {
+    grid-template-columns: 1fr;
+  }
+
+  .impact-section-title {
+    align-items: flex-start;
+  }
+
+  .impact-company-heading {
+    align-items: flex-start;
   }
 }
 
