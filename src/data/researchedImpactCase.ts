@@ -15,6 +15,8 @@ export const lngCanadaPhaseTwoStory: Story = {
 export const lngCanadaPhaseTwoAnalysis: MarketImpactAnalysis = {
   provenance: 'manual-research',
   reviewedAt: '2026-10-12',
+  generatedAt: null,
+  model: null,
   label: 'Hand-researched historical case study · not an assessment of current news',
   executiveSummary: 'Shell’s Phase 2 final investment decision creates a direct, long-dated project exposure for Shell: the company says it holds 40% of LNG Canada and expects nearly 6 million tonnes per annum of additional LNG entitlement from the expansion. That creates a possible route to higher long-run sales, while adding a large construction and infrastructure commitment. The release does not disclose Phase 2 capital cost or independent project economics, so the net business effect remains uncertain.',
   classification: 'Mixed',

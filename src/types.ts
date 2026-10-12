@@ -13,7 +13,7 @@ export interface AffectedCompany {
   explanation: string;
   evidenceIds: string[];
 }
-export type ImpactClaimType = 'verified-fact' | 'interpretation' | 'hypothesis';
+export type ImpactClaimType = 'verified-fact' | 'source-attributed-fact' | 'interpretation' | 'hypothesis';
 export interface ImpactClaim {
   id: string;
   statement: string;
@@ -30,8 +30,10 @@ export interface ImpactSource {
   accessedAt: string;
 }
 export interface MarketImpactAnalysis {
-  provenance: 'demo' | 'manual-research';
+  provenance: 'demo' | 'manual-research' | 'ai-assisted';
   reviewedAt: string | null;
+  generatedAt: string | null;
+  model: string | null;
   label: string;
   executiveSummary: string;
   classification: ImpactClassification;
@@ -44,6 +46,17 @@ export interface MarketImpactAnalysis {
   risks: string[];
   claims: ImpactClaim[];
   sources: ImpactSource[];
+}
+export interface GeneratedImpactAnalysis {
+  generatedAt: string;
+  model: string;
+  analysis: MarketImpactAnalysis;
+}
+export interface ImpactAnalysisFeedPayload {
+  generatedAt: string | null;
+  provider: string;
+  status: 'not-configured' | 'ready' | 'degraded';
+  analyses: Record<string, GeneratedImpactAnalysis>;
 }
 export interface Market { name: string; symbol: string; value: string; change: string; positive: boolean; mode: DataMode; provider: string; asOf: string | null; }
 export interface SourceResult<T> { data: T; fetchedAt: string; provider: string; mode: DataMode; }

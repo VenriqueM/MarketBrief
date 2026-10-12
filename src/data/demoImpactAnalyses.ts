@@ -4,6 +4,8 @@ import type { MarketImpactAnalysis } from '../types';
 export const demoMarketImpactAnalysis: MarketImpactAnalysis = {
   provenance: 'demo',
   reviewedAt: null,
+  generatedAt: null,
+  model: null,
   label: 'Static interface example · not generated from the selected article',
   executiveSummary: 'This example shows how an analyst might structure a market review. It does not assess the selected headline. No verified event details or issuer exposure are supplied in this demo.',
   classification: 'Uncertain',

@@ -5,18 +5,20 @@ import { ResearchCaseStudy } from './components/ResearchCaseStudy';
 import { TradingViewIframeWidget, TradingViewTickerTape } from './components/TradingViewWidget';
 import { loadState, saveState } from './lib/storage';
 import { CATEGORIES } from './types';
-import type { AppState, Category, Market, ProviderStatus, Story } from './types';
+import type { AppState, Category, GeneratedImpactAnalysis, Market, ProviderStatus, Story } from './types';
 import { sourceConfig } from './config/sources';
 import { demoNewsProvider } from './providers/news/demoNewsProvider';
 import { staticGovernmentNewsProvider } from './providers/news/staticGovernmentNewsProvider';
 import { bankOfCanadaProvider } from './providers/market/bankOfCanadaProvider';
 import { demoMarketProvider } from './providers/market/demoMarketProvider';
+import { staticImpactAnalysisProvider } from './providers/impact/staticImpactAnalysisProvider';
 
 const initialStatus: ProviderStatus = { loading: true, error: null, fetchedAt: null, provider: 'Starting', mode: 'demo' };
 
 export default function App() {
   const [state, setState] = useState<AppState>(loadState);
   const [stories, setStories] = useState<Story[]>([]);
+  const [aiAnalyses, setAiAnalyses] = useState<Record<string, GeneratedImpactAnalysis>>({});
   const [markets, setMarkets] = useState<Market[]>([]);
   const [newsStatus, setNewsStatus] = useState<ProviderStatus>(initialStatus);
   const [marketStatus, setMarketStatus] = useState<ProviderStatus>(initialStatus);
@@ -56,6 +58,9 @@ export default function App() {
       }
     };
     void load();
+    void staticImpactAnalysisProvider.fetchAnalyses(controller.signal)
+      .then(setAiAnalyses)
+      .catch(() => setAiAnalyses({}));
     return () => { window.clearTimeout(timeout); controller.abort(); };
   }, []);
   useEffect(() => {
@@ -85,7 +90,7 @@ export default function App() {
           <div className="category-pills" aria-label="Filter categories"><button className={category === 'All stories' ? 'chosen' : ''} onClick={() => setCategory('All stories')}>All</button>{CATEGORIES.map(item => <button key={item} className={category === item ? 'chosen' : ''} onClick={() => setCategory(category === item ? 'All stories' : item)}>{item}</button>)}</div>
           {newsStatus.error && <div className="source-error" role="status">{newsStatus.error}</div>}
           {newsStatus.loading && <div className="empty-state" role="status">Loading the latest briefing…</div>}
-          <div className="story-list">{filtered.map(story => <StoryCard key={story.id} story={story} bookmarked={state.bookmarks.includes(story.id)} note={state.notes[story.id] || ''} onBookmark={() => toggleBookmark(story.id)} onNote={value => update({ notes: { ...state.notes, [story.id]: value } })}/>)}</div>
+          <div className="story-list">{filtered.map(story => <StoryCard key={story.id} story={story} bookmarked={state.bookmarks.includes(story.id)} note={state.notes[story.id] || ''} onBookmark={() => toggleBookmark(story.id)} onNote={value => update({ notes: { ...state.notes, [story.id]: value } })} analysis={story.mode === 'live' ? aiAnalyses[story.id]?.analysis ?? null : undefined}/>)}</div>
           {filtered.length === 0 && <div className="empty-state"><span>⌕</span><h3>No stories found</h3><p>Try a different search or clear your filters to see the full demo feed.</p><button onClick={() => { setQuery(''); setCategory('All stories'); setSavedOnly(false); }}>Clear filters</button></div>}
           <div className="feed-footnote">{newsStatus.mode === 'demo' ? 'Fictional demo stories only. Their links are disabled.' : <>Official Government of Canada material reproduced for non-commercial use under <a href="https://www.canada.ca/en/transparency/terms.html" target="_blank" rel="noreferrer">Canada.ca terms</a>. Headlines and descriptions are copied from source feeds, linked to the original, and do not imply government endorsement. GitHub refreshes feeds hourly; news coverage is limited to these official Canadian sources.</>}</div>
         </section>

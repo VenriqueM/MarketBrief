@@ -35,6 +35,12 @@ jobs:
           GITHUB_PAGES: 'true'
       - name: Refresh official news feeds
         run: node scripts/fetch-news.mjs
+      - name: Generate one capped AI analysis draft
+        run: node scripts/generate-impact-analyses.mjs
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          MARKETBRIEF_SITE_URL: https://venriquem.github.io/MarketBrief/
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
         with:

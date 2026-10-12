@@ -794,6 +794,14 @@ a {
   background: #83ae91;
 }
 
+.impact-ai-banner {
+  color: #c1afe1;
+}
+
+.impact-ai-banner .impact-demo-dot {
+  background: #a58acb;
+}
+
 .impact-unavailable-banner {
   color: #abb1b3;
 }
@@ -859,6 +867,11 @@ a {
 .impact-claim-verified-fact {
   border-color: #365743;
   color: #9dd0ad;
+}
+
+.impact-claim-source-attributed-fact {
+  border-color: #55456f;
+  color: #c1afe1;
 }
 
 .impact-claim-interpretation {

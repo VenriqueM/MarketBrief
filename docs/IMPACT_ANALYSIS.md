@@ -33,6 +33,8 @@ Run `validateImpactAnalysis` while authoring. It checks unique IDs, secure links
 
 The panel links claims and the company relationship to the cited Shell sources, labels the company's return estimate as company guidance, and records the review date. The example uses Shell's announcement and investor FAQ as primary sources; it is not independently verified research and does not quantify Phase 2 economics. Its scenarios are conditional analyst interpretations. Recheck the sources and project status before reusing it after the recorded review date.
 
-## Future AI-assisted analysis
+## AI assistance and hosting
 
-Do not put an AI provider key in this Vite frontend. Browser code and `VITE_*` values are public. AI assistance would require a trusted server-side function to protect credentials, control data sent to the provider, validate structured output, and preserve source citations. That means adding an external service and possibly usage costs; review hosting, privacy, and budget before building it. Model output should remain a draft until its claims and company links are checked against the cited sources.
+MarketBrief now has an optional pre-generated AI draft workflow; setup, data scope, quota, and limitations are documented in [AI_ANALYSIS.md](AI_ANALYSIS.md). It uses a GitHub-hosted runner, so it does not need a visitor-facing backend, but it does send public news metadata to an external model provider.
+
+Do not put an AI provider key in this Vite frontend. Browser code and `VITE_*` values are public. On-demand AI generation would require a trusted server-side function to protect credentials, plus rate limits, abuse controls, and usage monitoring. That adds infrastructure and may add cost; review hosting, privacy, and budget before enabling an on-demand design. Model output must remain a draft until its claims and company links are checked against cited sources.

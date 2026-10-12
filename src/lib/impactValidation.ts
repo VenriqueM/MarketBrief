@@ -37,8 +37,8 @@ export function validateImpactAnalysis(analysis: MarketImpactAnalysis): ImpactVa
     }
     claimIds.add(claim.id);
 
-    if (claim.type === 'verified-fact' && claim.evidenceIds.length === 0) {
-      issues.push({ claimId: claim.id, message: 'Verified facts need at least one cited source.' });
+    if ((claim.type === 'verified-fact' || claim.type === 'source-attributed-fact') && claim.evidenceIds.length === 0) {
+      issues.push({ claimId: claim.id, message: 'Factual claims need at least one cited source.' });
     }
     for (const evidenceId of claim.evidenceIds) {
       if (!sourceIds.has(evidenceId)) {
