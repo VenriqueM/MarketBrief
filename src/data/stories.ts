@@ -1,0 +1,12 @@
+import type { Story } from '../types';
+
+// Fictional examples for interface development. They are not reporting and have no article destinations.
+export const stories: Story[] = [
+  { id: 'demo-1', headline: 'Ottawa outlines a fictional framework for clean technology investment', category: 'Canadian news', source: 'MarketBrief Demo Desk', publishedAt: '2026-10-11T13:45:00Z', description: 'A sample policy scenario explores how incentives might shape capital spending across Canadian industries.', url: '#' },
+  { id: 'demo-2', headline: 'Illustrative earnings preview puts cloud spending in focus', category: 'Technology', source: 'MarketBrief Demo Desk', publishedAt: '2026-10-11T12:32:00Z', description: 'This fictional preview follows infrastructure budgets, enterprise demand and the pace of AI-related investment.', url: '#' },
+  { id: 'demo-3', headline: 'US futures hold steady in a made-up pre-market session', category: 'US markets', source: 'MarketBrief Demo Desk', publishedAt: '2026-10-11T11:18:00Z', description: 'A simulated market wrap demonstrates how index moves and sector trends could appear in this feed.', url: '#' },
+  { id: 'demo-4', headline: 'Central banks weigh a hypothetical pause as growth cools', category: 'Global economics', source: 'MarketBrief Demo Desk', publishedAt: '2026-10-11T10:04:00Z', description: 'A fictional macroeconomic brief considers inflation, wages and rate expectations across major economies.', url: '#' },
+  { id: 'demo-5', headline: 'Regional lender sample highlights resilience in small business credit', category: 'Business & finance', source: 'MarketBrief Demo Desk', publishedAt: '2026-10-11T08:51:00Z', description: 'An invented company example illustrates the financial and operating context provided with each story.', url: '#' },
+  { id: 'demo-6', headline: 'Cities test a fictional heat-risk map for public infrastructure', category: 'General news', source: 'MarketBrief Demo Desk', publishedAt: '2026-10-10T21:40:00Z', description: 'This sample headline shows the broader news category and its concise summary treatment.', url: '#' },
+  { id: 'demo-7', headline: 'Toronto-listed manufacturer announces a simulated factory expansion', category: 'Canadian news', source: 'MarketBrief Demo Desk', publishedAt: '2026-10-10T19:14:00Z', description: 'A demo business update gives readers a place to test bookmarks and attach private notes.', url: '#' },
+];
