@@ -61,7 +61,7 @@ export default function App() {
     const matchesCategory = category === 'All stories' || story.category === category;
     const text = `${story.headline} ${story.description} ${story.source} ${story.category}`.toLowerCase();
     return matchesCategory && text.includes(query.toLowerCase()) && (!savedOnly || state.bookmarks.includes(story.id));
-  }).sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt)), [category, query, savedOnly, state.bookmarks]);
+  }).sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt)), [stories, category, query, savedOnly, state.bookmarks]);
   const update = (partial: Partial<AppState>) => setState(current => ({ ...current, ...partial }));
   const toggleBookmark = (id: string) => update({ bookmarks: state.bookmarks.includes(id) ? state.bookmarks.filter(item => item !== id) : [...state.bookmarks, id] });
   const toggleWatch = (symbol: string) => update({ watchlist: state.watchlist.includes(symbol) ? state.watchlist.filter(item => item !== symbol) : [...state.watchlist, symbol] });
