@@ -2,6 +2,8 @@ import type { MarketImpactAnalysis } from '../types';
 
 /** Static UI example only. It is never derived from a story or live market data. */
 export const demoMarketImpactAnalysis: MarketImpactAnalysis = {
+  provenance: 'demo',
+  reviewedAt: null,
   label: 'Static interface example · not generated from the selected article',
   executiveSummary: 'This example shows how an analyst might structure a market review. It does not assess the selected headline. No verified event details or issuer exposure are supplied in this demo.',
   classification: 'Uncertain',
@@ -17,5 +19,6 @@ export const demoMarketImpactAnalysis: MarketImpactAnalysis = {
     'Company exposure, financial materiality, and market expectations have not been assessed.',
     'No independent supporting research has been selected for this example.',
   ],
+  claims: [],
   sources: [],
 };

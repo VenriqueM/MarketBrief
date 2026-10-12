@@ -1,4 +1,5 @@
 import type { MarketImpactAnalysis, Story } from '../types';
+import { validateImpactAnalysis } from '../lib/impactValidation';
 
 function isHttpsUrl(value: string): boolean {
   try {
@@ -12,22 +13,43 @@ function classificationClass(value: MarketImpactAnalysis['classification']): str
   return `impact-classification impact-${value.toLowerCase()}`;
 }
 
+const claimLabels = {
+  'verified-fact': 'VERIFIED FACT',
+  interpretation: 'INTERPRETATION',
+  hypothesis: 'HYPOTHESIS',
+} as const;
+
 export function MarketImpactPanel({ story, analysis, panelId, hidden }: {
   story: Story;
   analysis: MarketImpactAnalysis | null;
   panelId: string;
   hidden: boolean;
 }) {
-  const articleLink = story.mode === 'live' && isHttpsUrl(story.url) ? story.url : null;
+  const articleLink = story.mode !== 'demo' && isHttpsUrl(story.url) ? story.url : null;
+  const validationIssues = analysis ? validateImpactAnalysis(analysis) : [];
+  const demoAnalysis = analysis?.provenance === 'demo';
 
   return <section id={panelId} className="market-impact-panel" aria-label={`Market impact analysis for ${story.headline}`} hidden={hidden}>
     {analysis ? <>
-      <div className="impact-demo-banner"><span className="impact-demo-dot"/> STATIC DEMO ANALYSIS <span>·</span> NOT GENERATED FROM THIS ARTICLE</div>
-      <p className="impact-disclaimer">This is a reusable interface example, not a review of the selected story or current market data. It contains no verified company relationships, price targets, probabilities, or stock-price predictions.</p>
+      <div className={`impact-demo-banner ${demoAnalysis ? '' : 'impact-research-banner'}`}><span className="impact-demo-dot"/> {demoAnalysis ? <>STATIC DEMO ANALYSIS <span>·</span> NOT GENERATED FROM THIS ARTICLE</> : <>MANUALLY RESEARCHED CASE STUDY <span>·</span> REVIEWED {analysis.reviewedAt ? new Date(`${analysis.reviewedAt}T12:00:00`).toLocaleDateString() : 'DATE NOT RECORDED'}</>}</div>
+      <p className="impact-disclaimer">{demoAnalysis ? 'This is a reusable interface example, not a review of the selected story or current market data. It contains no verified company relationships, price targets, probabilities, or stock-price predictions.' : 'Historical company announcement used as a research example, not current news. Facts below are attributed to linked sources; business-impact analysis and scenarios are interpretations, not predictions of share-price movement.'}</p>
 
       <section className="impact-block impact-summary">
         <h4>Executive summary</h4>
         <p>{analysis.executiveSummary}</p>
+      </section>
+
+      <section className="impact-block impact-evidence-ledger">
+        <div className="impact-section-title"><h4>Evidence ledger</h4><span>{analysis.claims.length} STATEMENTS</span></div>
+        {validationIssues.length > 0 && <p className="impact-validation-warning" role="status">Research entry needs review: {validationIssues.map(issue => issue.message).join(' ')}</p>}
+        {analysis.claims.length > 0 ? <ul className="impact-claim-list">{analysis.claims.map(claim => <li key={claim.id}>
+          <span className={`impact-claim-type impact-claim-${claim.type}`}>{claimLabels[claim.type]}</span>
+          <span>{claim.statement}</span>
+          {claim.evidenceIds.length > 0 && <span className="impact-claim-citations">Evidence: {claim.evidenceIds.map(id => {
+            const source = analysis.sources.find(item => item.id === id);
+            return source && isHttpsUrl(source.url) ? <a key={id} href={source.url} target="_blank" rel="noopener noreferrer">{source.publisher} ↗</a> : null;
+          })}</span>}
+        </li>)}</ul> : <p className="impact-empty-ledger">No sourced research statements are included in this interface demo. In a researched analysis, factual claims will link directly to evidence; interpretation and scenario hypotheses will be labelled separately.</p>}
       </section>
 
       <section className="impact-block">
@@ -36,6 +58,10 @@ export function MarketImpactPanel({ story, analysis, panelId, hidden }: {
           <div className="impact-company-heading"><strong>{company.name}</strong><span className="impact-ticker">{company.exchange}:{company.ticker}</span><span className={classificationClass(company.classification)}>{company.classification}</span></div>
           <p className="impact-relationship">{company.relationship}</p>
           <p>{company.explanation}</p>
+          {company.evidenceIds.length > 0 && <p className="impact-company-evidence">Evidence: {company.evidenceIds.map(id => {
+            const source = analysis.sources.find(item => item.id === id);
+            return source && isHttpsUrl(source.url) ? <a key={id} href={source.url} target="_blank" rel="noopener noreferrer">{source.publisher} ↗</a> : null;
+          })}</p>}
           <a className="impact-research-link" href={`https://www.tradingview.com/search/?query=${encodeURIComponent(`${company.exchange}:${company.ticker}`)}`} target="_blank" rel="noopener noreferrer">Search ticker on TradingView ↗</a>
         </article>)}</div> : <div className="impact-empty-company"><strong>No companies identified</strong><p>There is not enough verified evidence in this static demo to establish a news-to-company relationship. Naming an issuer would be guesswork.</p></div>}
       </section>
@@ -63,7 +89,7 @@ export function MarketImpactPanel({ story, analysis, panelId, hidden }: {
       <section className="impact-block impact-sources">
         <h4>Sources and further research</h4>
         {articleLink && <a className="impact-research-link" href={articleLink} target="_blank" rel="noopener noreferrer">Open original article ↗</a>}
-        {analysis.sources.map(source => isHttpsUrl(source.url) && <a className="impact-research-link" key={source.url} href={source.url} target="_blank" rel="noopener noreferrer">{source.label} ↗</a>)}
+        {analysis.sources.map(source => isHttpsUrl(source.url) && <a className="impact-research-link" key={source.id} href={source.url} target="_blank" rel="noopener noreferrer">{source.label} · {source.publisher}{source.publishedAt ? ` · ${new Date(source.publishedAt).toLocaleDateString()}` : ''} ↗</a>)}
         {!articleLink && analysis.sources.length === 0 && <p>This fictional demo item has no original article or supporting sources. No ticker links are shown because no company has been identified.</p>}
       </section>
     </> : <>

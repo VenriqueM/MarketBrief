@@ -786,6 +786,14 @@ a {
   background: var(--amber);
 }
 
+.impact-research-banner {
+  color: #b7d1c0;
+}
+
+.impact-research-banner .impact-demo-dot {
+  background: #83ae91;
+}
+
 .impact-unavailable-banner {
   color: #abb1b3;
 }
@@ -819,6 +827,82 @@ a {
   color: #aeb3b5;
   font-size: 12px;
   line-height: 1.55;
+}
+
+.impact-claim-list {
+  display: grid;
+  gap: 10px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.impact-claim-list li {
+  display: grid;
+  grid-template-columns: max-content minmax(0,1fr);
+  align-items: start;
+  gap: 5px 9px;
+  color: #c1c5c6;
+}
+
+.impact-claim-type {
+  padding: 2px 6px;
+  border: 1px solid #45484b;
+  border-radius: 999px;
+  color: #c0c5c6;
+  font-family: 'DM Mono',monospace;
+  font-size: 8px;
+  letter-spacing: .35px;
+  white-space: nowrap;
+}
+
+.impact-claim-verified-fact {
+  border-color: #365743;
+  color: #9dd0ad;
+}
+
+.impact-claim-interpretation {
+  border-color: #635334;
+  color: #dec384;
+}
+
+.impact-claim-hypothesis {
+  border-color: #45484b;
+  color: #b8bec0;
+}
+
+.impact-claim-citations {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  color: #929a9d;
+  font-size: 10px;
+}
+
+.impact-claim-citations a {
+  color: #dfbf79;
+  text-decoration: none;
+}
+
+.impact-claim-citations a:hover {
+  color: #f0d695;
+  text-decoration: underline;
+}
+
+.impact-empty-ledger,.impact-validation-warning {
+  margin: 9px 0 0;
+  padding: 9px 10px;
+  border-radius: var(--radius-sm);
+  background: #15171a;
+  color: #aeb3b5;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.impact-validation-warning {
+  border: 1px solid #704941;
+  color: #e2a195;
 }
 
 .impact-section-title,.impact-company-heading,.impact-classification-row {
@@ -920,6 +1004,24 @@ a {
   color: #cfbb8c !important;
 }
 
+.impact-company-evidence {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 9px;
+  color: #929a9d !important;
+  font-size: 10px !important;
+}
+
+.impact-company-evidence a {
+  color: #dfbf79;
+  text-decoration: none;
+}
+
+.impact-company-evidence a:hover {
+  color: #f0d695;
+  text-decoration: underline;
+}
+
 .impact-scenarios {
   display: grid;
   grid-template-columns: repeat(2,minmax(0,1fr));
@@ -977,6 +1079,14 @@ a {
   margin-top: 11px;
   color: #a6a9a7;
   font-size: 11px;
+}
+
+.research-case-section {
+  margin-top: 26px;
+}
+
+.research-case-card {
+  margin-top: 13px;
 }
 
 .note-field textarea {

@@ -19,6 +19,8 @@ A responsive financial news and market intelligence dashboard built with React, 
 - Bookmarks, private notes, and a starter watchlist saved in browser localStorage.
 - Compact TradingView market, market-news, and economic-calendar widgets with links to full TradingView charting.
 - Typed news and market provider interfaces, source validation, source labels, loading/error states, and demo fallback.
+- A demo-only Market Impact Analysis panel with a typed evidence ledger and research standard. It is not generated from stories; see [docs/IMPACT_ANALYSIS.md](docs/IMPACT_ANALYSIS.md).
+- One manually researched, historical LNG Canada Phase 2 case study with linked Shell primary sources. It appears separately from the live news feed and is not a current-news signal.
 - Responsive layout, keyboard navigation, visible focus indicators, and empty states.
 
 Local preferences stay in the browser profile on the current device. They do not automatically sync to a phone, tablet, or another computer. GitHub Pages serves the static frontend while your Macs are off. Sync, accounts, and private server-side data would require a backend service.

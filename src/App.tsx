@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { MarketStrip } from './components/MarketStrip';
 import { StoryCard } from './components/StoryCard';
+import { ResearchCaseStudy } from './components/ResearchCaseStudy';
 import { TradingViewIframeWidget, TradingViewTickerTape } from './components/TradingViewWidget';
 import { loadState, saveState } from './lib/storage';
 import { CATEGORIES } from './types';
@@ -88,6 +89,7 @@ export default function App() {
           {filtered.length === 0 && <div className="empty-state"><span>⌕</span><h3>No stories found</h3><p>Try a different search or clear your filters to see the full demo feed.</p><button onClick={() => { setQuery(''); setCategory('All stories'); setSavedOnly(false); }}>Clear filters</button></div>}
           <div className="feed-footnote">{newsStatus.mode === 'demo' ? 'Fictional demo stories only. Their links are disabled.' : <>Official Government of Canada material reproduced for non-commercial use under <a href="https://www.canada.ca/en/transparency/terms.html" target="_blank" rel="noreferrer">Canada.ca terms</a>. Headlines and descriptions are copied from source feeds, linked to the original, and do not imply government endorsement. GitHub refreshes feeds hourly; news coverage is limited to these official Canadian sources.</>}</div>
         </section>
+        <ResearchCaseStudy />
         <div id="markets"><MarketStrip markets={markets} status={marketStatus} watchlist={state.watchlist} toggleWatch={toggleWatch} widgetFailed={marketWidgetFailed} onWidgetFailure={() => setMarketWidgetFailed(true)}/></div>
         <section className="intel-grid" aria-label="Market news and upcoming economic events">
           <article className="intel-panel"><div className="section-heading"><div><p className="eyebrow">MARKET MOVERS</p><h2>Top stories</h2></div><span className="widget-source">TRADINGVIEW</span></div><p className="panel-note">Market stories from TradingView. Story times are supplied by the provider.</p><TradingViewIframeWidget kind="top-stories"/></article>
