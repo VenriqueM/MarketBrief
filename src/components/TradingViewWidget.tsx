@@ -2,20 +2,18 @@ import { useEffect, useRef, useState } from 'react';
 
 type EmbedKind = 'top-stories' | 'economic-calendar';
 
-const iframeWidgets: Record<EmbedKind, { src: string; href: string; title: string; height: number; config: Record<string, unknown> }> = {
+const iframeWidgets: Record<EmbedKind, { src: string; href: string; title: string; config: Record<string, unknown> }> = {
   'top-stories': {
     src: 'https://s3.tradingview.com/external-embedding/embed-widget-timeline.js',
     href: 'https://www.tradingview.com/news/top-providers/tradingview/',
     title: 'Top market stories by TradingView',
-    height: 465,
-    config: { displayMode: 'regular', feedMode: 'all_symbols', colorTheme: 'dark', isTransparent: true, locale: 'en', width: '100%', height: 465 },
+    config: { displayMode: 'adaptive', feedMode: 'all_symbols', colorTheme: 'dark', isTransparent: true, locale: 'en', width: '100%' },
   },
   'economic-calendar': {
     src: 'https://s3.tradingview.com/external-embedding/embed-widget-events.js',
     href: 'https://www.tradingview.com/economic-calendar/',
     title: 'Economic calendar by TradingView',
-    height: 465,
-    config: { colorTheme: 'dark', isTransparent: true, locale: 'en', countryFilter: 'ca,us,eu,gb,jp,cn', importanceFilter: '0,1', width: '100%', height: 465 },
+    config: { colorTheme: 'dark', isTransparent: true, locale: 'en', countryFilter: 'ca,us,eu,gb,jp,cn', importanceFilter: '0,1', width: '100%' },
   },
 };
 
@@ -28,26 +26,34 @@ export function TradingViewIframeWidget({ kind }: { kind: EmbedKind }) {
     const container = containerRef.current;
     if (!container) return;
     setFailed(false);
-    container.replaceChildren();
-    const frame = document.createElement('div');
-    frame.className = 'tradingview-widget-container__widget';
-    frame.style.height = `${widget.height}px`;
-    const credit = document.createElement('div');
-    credit.className = 'tradingview-widget-copyright';
-    const link = document.createElement('a');
-    link.href = widget.href;
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    link.textContent = kind === 'top-stories' ? 'Top stories' : 'Economic Calendar';
-    credit.append(link, document.createTextNode(' by TradingView'));
-    const script = document.createElement('script');
-    script.src = widget.src;
-    script.async = true;
-    script.type = 'text/javascript';
-    script.textContent = JSON.stringify(widget.config);
-    script.onerror = () => setFailed(true);
-    container.append(frame, credit, script);
-    return () => { container.replaceChildren(); };
+    let renderedHeight = 0;
+    const render = () => {
+      const width = container.clientWidth;
+      if (!width) return;
+      const height = width < 480 ? 400 : width < 720 ? 440 : width < 1000 ? 480 : 500;
+      if (height === renderedHeight) return;
+      renderedHeight = height;
+      container.replaceChildren();
+      const credit = document.createElement('div');
+      credit.className = 'tradingview-widget-copyright';
+      const link = document.createElement('a');
+      link.href = widget.href;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = kind === 'top-stories' ? 'Top stories' : 'Economic Calendar';
+      credit.append(link, document.createTextNode(' by TradingView'));
+      const script = document.createElement('script');
+      script.src = widget.src;
+      script.async = true;
+      script.type = 'text/javascript';
+      script.textContent = JSON.stringify({ ...widget.config, height });
+      script.onerror = () => setFailed(true);
+      container.append(script, credit);
+    };
+    const observer = new ResizeObserver(render);
+    observer.observe(container);
+    render();
+    return () => { observer.disconnect(); container.replaceChildren(); };
   }, [kind, widget]);
 
   return <div className="tv-embed" ref={containerRef} aria-label={widget.title}>
