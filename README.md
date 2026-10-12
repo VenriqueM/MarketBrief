@@ -1,25 +1,28 @@
 # MarketBrief
 
-A responsive, dark financial news and market intelligence dashboard built with React, TypeScript, Vite, and plain CSS.
+A responsive financial news and market intelligence dashboard built with React, TypeScript, Vite, and plain CSS.
 
-> **Demo only:** Market figures are illustrative examples, not live prices. Every initial story is fictional sample content, not real reporting. Story destinations are disabled. Do not use these values for financial decisions.
+## Current data status
+
+- News is fictional demo content and is labelled as such.
+- The S&P 500, Nasdaq Composite, S&P/TSX Composite, gold, and crude oil cards use illustrative values labelled **DEMO · NOT LIVE**.
+- USD/CAD attempts to load the Bank of Canada Valet daily reference rate in the visitor's browser. A successful response is dated and attributed on its card; on request, validation, or browser CORS failure, the card falls back to clearly labelled demo values.
+- The Bank of Canada rate is a daily reference rate, not an intraday trading quote. It is not financial advice.
+- See [docs/SOURCES.md](docs/SOURCES.md) for source access and licensing notes.
 
 ## Features
 
-- Market overview cards for the S&P 500, Nasdaq Composite, S&P/TSX Composite, USD/CAD, gold, and crude oil.
-- Searchable, filterable news feed across six categories, sorted newest first.
-- Story bookmarks, research notes, and a starter watchlist.
-- Responsive layout, keyboard accessible controls, visible focus indicators, and empty states.
-- Browser localStorage for bookmarks, notes, and watchlist.
+- Search, category filtering, and newest-first sorting across six news topics.
+- Bookmarks, private notes, and a starter watchlist saved in browser localStorage.
+- Typed news and market provider interfaces, source validation, source labels, loading/error states, and demo fallback.
+- Responsive layout, keyboard navigation, visible focus indicators, and empty states.
 
-Local data lives in the current browser profile on the current device. It does not synchronize to your phone, tablet, or another computer. The static GitHub Pages site does not need your Mac to be on and has no backend.
+Local preferences stay in the browser profile on the current device. They do not automatically sync to a phone, tablet, or another computer. GitHub Pages serves the static frontend while your Macs are off. Sync, accounts, and private server-side data would require a backend service.
 
-## Requirements
+## Requirements and local development
 
 - Node.js 24 LTS (npm is included)
 - Git
-
-## Develop
 
 ```sh
 npm install
@@ -35,16 +38,10 @@ npm run build
 npm run preview
 ```
 
-The production files are written to `dist/`. The build runs TypeScript checks before bundling. No separate automated test suite is included in this first version.
+The production files go to `dist/`. `npm run build` runs TypeScript project checks and Vite bundling. No separate automated test suite is configured.
 
-## Publish on GitHub Pages
+## Deployment
 
-The workflow at `.github/workflows/deploy.yml` builds the site on GitHub Actions and publishes the result to GitHub Pages. Deployment runs on GitHub's hosted runners; your personal computers do not serve the production site.
+The `.github/workflows/deploy.yml` workflow builds and publishes the site on GitHub-hosted runners; no personal computer serves the production site. The Vite base path is set for `https://venriquem.github.io/MarketBrief/` during the Pages build. GitHub Pages must use **GitHub Actions** as its deployment source.
 
-This project is configured for a project site at `https://YOUR-GITHUB-USERNAME.github.io/MarketBrief/`. The repository must be named `MarketBrief` for that base path. If you choose another repository name, update `base` in `vite.config.ts` before publishing.
-
-After pushing the `main` branch, open the repository's **Settings → Pages** and select **GitHub Actions** as the build and deployment source. The workflow needs the repository's standard Pages deployment permissions. No secrets or paid hosting services are needed.
-
-## Data and future integrations
-
-All current stories and quotes are bundled demo data. Real market data and reporting require appropriately licensed sources and API integration. Features currently stored in this browser include bookmarks, notes, and watchlist. Cross-device sync, accounts, shared notes, or private server-side data would need an external service or backend; none is included here.
+The static site contains no private API credentials. Never add a secret to a `VITE_*` variable: Vite embeds frontend environment variables into public browser assets. Providers needing private keys require a server-side design and separate review before adding infrastructure.
