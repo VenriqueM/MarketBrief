@@ -1,18 +1,19 @@
 # Data source review
 
-Checked 11 October 2026. A source being technically accessible does not by itself grant rights to republish its content. Confirm provider terms again before adding any new data fields or redistribution.
+Checked 12 October 2026. A source being technically accessible does not by itself grant rights to republish its content. Confirm provider terms again before adding any new data fields or redistribution.
 
 ## News
 
 | Source | Access and reuse finding | MarketBrief decision |
 | --- | --- | --- |
+| Government of Canada Canada.ca RSS/Atom | The official subscriptions page provides national, audience, organization, and topic feeds with publish dates and links. Canada.ca terms allow non-commercial reproduction of government material if the full title, author where available, and original URL are included; third-party material may have separate restrictions. | Connected through an hourly GitHub Actions refresh. The app keeps source attribution and original links, does not use government symbols, and states it is not affiliated with or endorsed by Canada. Coverage is official Canadian releases, not a general newswire. |
 | CBC News RSS | CBC RSS availability and current reuse terms could not be confirmed from accessible official documentation during this review. | Do not fetch or republish until current terms and feed availability are confirmed. |
 | BBC News RSS | BBC terms allow an individual to add BBC News RSS to a website if the feed/branding requirements are respected and prominent BBC News attribution/linking is provided. BBC says business RSS use requires permission and may involve a fee. A public GitHub Pages app is public; this project will not assume that personal-use permission applies. | Not connected pending written permission or clearer permission applicable to this public app. |
 | Bloomberg | Bloomberg's terms restrict copying, displaying, publishing, and redistributing its service absent written permission. | Not used; link-only editorial discovery is possible later if terms permit. |
 | Bank of Canada | Valet exposes central-bank publications/data, not a general news wire. Bank website terms require attribution, caution against excessive requests, and identify possible third-party rights. | Use only the specific Valet daily FX series for which the API documents access; attribute it and request a modest amount of data. |
-| Statistics Canada | The Web Data Service (WDS) is a JSON API for statistical data and metadata, updated on business days; it is not a general-purpose news API. Statistics Canada's Open Licence permits reuse of covered material with its required source notice and excludes third-party material. | Suitable later for attributed statistics/release links, not turned into editorial summaries here. |
+| Statistics Canada | Statistics Canada releases are available from the Government of Canada organization feed. Separately, its Open Licence permits reuse of covered information with a specific source notice; third-party material is excluded. | Connected through the Canada.ca feed under Canada.ca non-commercial terms, with source attribution and original links. A future direct Statistics Canada feed must include its specific Open Licence source notice. |
 
-For news, the dashboard stays on clearly labelled fictional demo content until a feed's explicit public display rights and browser access are verified.
+For news, the app uses official Canadian Government RSS/Atom stories with public non-commercial reproduction terms. GitHub Actions fetches source feeds hourly and emits `dist/news.json` as a static artifact. Failed feeds do not fail the Pages build; successful sources remain available, and if the feed file is unavailable in the browser the app switches to fictional demo stories. No private key or user-hosted server is required.
 
 ## Market data
 
@@ -33,4 +34,4 @@ For those reasons it is not the free first choice for this static app. Revisit o
 
 ## Provider design and fallback
 
-Provider contracts are separate from UI components. News and market data have independent types, configuration, validation, timestamps, loading/error status, and per-card mode labels. The current news adapter is the demo provider. The market adapter tries Bank of Canada and falls back to demo data when the request fails. No API key or backend is required.
+Provider contracts are separate from UI components. News and market data have independent types, configuration, validation, timestamps, loading/error status, and per-card mode labels. News reads a static GitHub Actions artifact built from official feeds and falls back to demo stories if unavailable. The market adapter tries Bank of Canada and falls back to demo data when the request fails. No API key or backend is required.

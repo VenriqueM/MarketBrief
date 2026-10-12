@@ -6,5 +6,6 @@ export interface Market { name: string; symbol: string; value: string; change: s
 export interface SourceResult<T> { data: T; fetchedAt: string; provider: string; mode: DataMode; }
 export interface ProviderStatus { loading: boolean; error: string | null; fetchedAt: string | null; provider: string; mode: DataMode; }
 export interface NewsProvider { readonly id: string; readonly label: string; fetchStories(signal?: AbortSignal): Promise<Story[]>; }
+export interface NewsFeedPayload { generatedAt: string; provider: string; stories: unknown; errors?: string[]; }
 export interface MarketDataProvider { readonly id: string; readonly label: string; fetchQuotes(signal?: AbortSignal): Promise<Market[]>; }
 export interface AppState { bookmarks: string[]; notes: Record<string, string>; watchlist: string[]; }

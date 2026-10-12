@@ -6,6 +6,7 @@ import { CATEGORIES } from './types';
 import type { AppState, Category, Market, ProviderStatus, Story } from './types';
 import { sourceConfig } from './config/sources';
 import { demoNewsProvider } from './providers/news/demoNewsProvider';
+import { staticGovernmentNewsProvider } from './providers/news/staticGovernmentNewsProvider';
 import { bankOfCanadaProvider } from './providers/market/bankOfCanadaProvider';
 import { demoMarketProvider } from './providers/market/demoMarketProvider';
 
@@ -28,12 +29,17 @@ export default function App() {
     const timeout = window.setTimeout(() => controller.abort(), sourceConfig.timeoutMs);
     const load = async () => {
       try {
-        const data = await demoNewsProvider.fetchStories(controller.signal);
+        const data = await staticGovernmentNewsProvider.fetchStories(controller.signal);
         setStories(data);
-        setNewsStatus({ loading: false, error: null, fetchedAt: new Date().toISOString(), provider: demoNewsProvider.label, mode: 'demo' });
+        setNewsStatus({ loading: false, error: null, fetchedAt: new Date().toISOString(), provider: staticGovernmentNewsProvider.label, mode: 'live' });
       } catch (error) {
-        setStories([]);
-        setNewsStatus({ loading: false, error: error instanceof Error ? error.message : 'Could not load stories.', fetchedAt: null, provider: demoNewsProvider.label, mode: 'demo' });
+        try {
+          const fallback = await demoNewsProvider.fetchStories();
+          setStories(fallback);
+        } catch {
+          setStories([]);
+        }
+        setNewsStatus({ loading: false, error: `${error instanceof Error ? error.message : 'Could not load stories.'} Showing clearly labelled demo stories instead.`, fetchedAt: null, provider: demoNewsProvider.label, mode: 'demo' });
       }
       try {
         const data = await bankOfCanadaProvider.fetchQuotes(controller.signal);
@@ -67,21 +73,21 @@ export default function App() {
   const toggleWatch = (symbol: string) => update({ watchlist: state.watchlist.includes(symbol) ? state.watchlist.filter(item => item !== symbol) : [...state.watchlist, symbol] });
   return <div className="app-shell">
     <aside className="sidebar"><a className="brand" href="#top"><span className="brand-icon">M<span>·</span></span><span>Market<span>Brief</span></span></a><div className="side-label">WORKSPACE</div><nav className="side-nav" aria-label="Dashboard sections"><a className="nav-link current" href="#markets">◫ <span>Market overview</span></a><a className="nav-link" href="#news">▤ <span>News feed</span></a><button className="nav-link" onClick={() => setSavedOnly(!savedOnly)} aria-pressed={savedOnly}>☆ <span>Saved research</span><b>{state.bookmarks.length}</b></button></nav><div className="sidebar-bottom"><div className="local-card"><span className="local-dot"/><div><strong>Local workspace</strong><small>Saved in this browser</small></div></div><p>Notes and bookmarks stay on this device. They do not sync between devices.</p></div></aside>
-    <main id="top" className="main"><header className="topbar"><div className="mobile-brand"><span className="brand-icon">M<span>·</span></span> MarketBrief</div><div className="topbar-right"><span className="demo-pill"><i/> DEMO CONTENT</span><span className="date-label">{shortToday}</span><span className="avatar" aria-hidden="true">MB</span></div></header>
-      <div className="content"><div className="welcome"><div><p className="eyebrow">{today.toUpperCase()}</p><h1>Markets, in focus.</h1><p className="welcome-sub">A clear read on the stories moving business and the economy.</p></div><span className="session-status"><i/> DEMO SESSION</span></div>
-        <div className="alert-banner"><span className="alert-mark">!</span><span><strong>Source labels matter.</strong> News stories remain fictional demo content. Some market cards may show the Bank of Canada’s daily USD/CAD reference rate; all other figures are illustrative demo values, not live prices.</span></div>
+    <main id="top" className="main"><header className="topbar"><div className="mobile-brand"><span className="brand-icon">M<span>·</span></span> MarketBrief</div><div className="topbar-right"><span className="demo-pill"><i/> {newsStatus.loading ? 'UPDATING FEED' : newsStatus.mode === 'live' ? 'OFFICIAL NEWS' : 'DEMO CONTENT'}</span><span className="date-label">{shortToday}</span><span className="avatar" aria-hidden="true">MB</span></div></header>
+      <div className="content"><div className="welcome"><div><p className="eyebrow">{today.toUpperCase()}</p><h1>Markets, in focus.</h1><p className="welcome-sub">A clear read on the stories moving business and the economy.</p></div><span className="session-status"><i/> {newsStatus.mode === 'live' ? 'OFFICIAL RELEASES' : 'DEMO SESSION'}</span></div>
+        <div className="alert-banner"><span className="alert-mark">!</span><span><strong>Know what you’re reading.</strong> {newsStatus.mode === 'live' ? 'Real headlines from official Canadian government feeds. This is not a broad US or global newswire; coverage is limited to the source feeds shown.' : 'The news list is fictional demo content until the GitHub Actions feed refresh runs. Some market cards may show the Bank of Canada’s daily USD/CAD reference rate; all other figures are illustrative demo values, not live prices.'} Some financial instruments remain demo values and are never shown as live prices.</span></div>
         <div id="markets"><MarketStrip markets={markets} status={marketStatus} watchlist={state.watchlist} toggleWatch={toggleWatch}/></div>
         <section id="news" className="news-section"><div className="section-heading news-heading"><div><p className="eyebrow">LATEST INTELLIGENCE</p><h2>{savedOnly ? 'Saved research' : 'The briefing'}</h2></div><span className="story-count">{filtered.length} STORIES</span></div>
           <div className="feed-controls"><label className="search-box"><span aria-hidden="true">⌕</span><input ref={searchRef} type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder="Search headlines and topics…" aria-label="Search headlines and topics"/><kbd>⌘ K</kbd></label><label className="select-wrap"><span className="sr-only">Filter by category</span><select value={category} onChange={event => setCategory(event.target.value as Category | 'All stories')}><option>All stories</option>{CATEGORIES.map(item => <option key={item}>{item}</option>)}</select></label></div>
           <div className="category-pills" aria-label="Filter categories"><button className={category === 'All stories' ? 'chosen' : ''} onClick={() => setCategory('All stories')}>All</button>{CATEGORIES.map(item => <button key={item} className={category === item ? 'chosen' : ''} onClick={() => setCategory(category === item ? 'All stories' : item)}>{item}</button>)}</div>
           {newsStatus.error && <div className="source-error" role="status">{newsStatus.error} Showing the demo feed where available.</div>}
-          {newsStatus.loading && <div className="empty-state" role="status">Loading the demo briefing…</div>}
+          {newsStatus.loading && <div className="empty-state" role="status">Loading the latest briefing…</div>}
           <div className="story-list">{filtered.map(story => <StoryCard key={story.id} story={story} bookmarked={state.bookmarks.includes(story.id)} note={state.notes[story.id] || ''} onBookmark={() => toggleBookmark(story.id)} onNote={value => update({ notes: { ...state.notes, [story.id]: value } })}/>)}</div>
           {filtered.length === 0 && <div className="empty-state"><span>⌕</span><h3>No stories found</h3><p>Try a different search or clear your filters to see the full demo feed.</p><button onClick={() => { setQuery(''); setCategory('All stories'); setSavedOnly(false); }}>Clear filters</button></div>}
-          <div className="feed-footnote">{newsStatus.mode === 'demo' ? 'Fictional demo stories only. Their links are disabled.' : 'Story links open the original publisher. Descriptions are shown only when allowed by that source.'}</div>
+          <div className="feed-footnote">{newsStatus.mode === 'demo' ? 'Fictional demo stories only. Their links are disabled.' : <>Official Government of Canada material reproduced for non-commercial use under <a href="https://www.canada.ca/en/transparency/terms.html" target="_blank" rel="noreferrer">Canada.ca terms</a>. Headlines and descriptions are copied from source feeds, linked to the original, and do not imply government endorsement. GitHub refreshes feeds hourly; news coverage is limited to these official Canadian sources.</>}</div>
         </section>
         {storageNotice && <div className="storage-error" role="status">Browser storage is unavailable or full. Your latest change may not persist after closing this tab.</div>}
-        <footer>MARKETBRIEF <span>·</span> News demo content <span>·</span> USD/CAD daily reference attempted; other cards remain demo</footer>
+        <footer>MARKETBRIEF <span>·</span> {newsStatus.mode === 'live' ? 'Official Canadian releases' : 'News demo content'} <span>·</span> USD/CAD daily reference attempted; other cards remain demo</footer>
       </div>
     </main>
   </div>;
