@@ -31,7 +31,7 @@ npm install
 npm run dev
 ```
 
-Open the local URL printed by Vite, usually `http://localhost:5173/`.
+`npm run dev` first refreshes the public news feeds into an ignored local file, then starts Vite. If the feeds cannot be reached, the app uses its clearly labelled fictional demo stories. Open the local URL printed by Vite, usually `http://localhost:5173/`.
 
 ## Build and preview
 

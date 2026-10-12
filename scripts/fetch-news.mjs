@@ -113,7 +113,8 @@ const payload = {
   errors: fetched.map(item => item.error).filter(Boolean),
 };
 
-await mkdir('dist', { recursive: true });
-await writeFile('dist/news.json', `${JSON.stringify(payload, null, 2)}\n`);
+const outputDir = process.argv.includes('--dev') ? 'public' : 'dist';
+await mkdir(outputDir, { recursive: true });
+await writeFile(`${outputDir}/news.json`, `${JSON.stringify(payload, null, 2)}\n`);
 console.log(`Wrote ${stories.length} official news stories from ${fetched.length - payload.errors.length}/${fetched.length} feeds.`);
 for (const error of payload.errors) console.warn(error);
