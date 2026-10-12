@@ -2,6 +2,16 @@
 
 Checked 12 October 2026. A source being technically accessible does not by itself grant rights to republish its content. Confirm provider terms again before adding any new data fields or redistribution.
 
+## Embedded briefing widgets
+
+| Source | Access and freshness | MarketBrief decision |
+| --- | --- | --- |
+| TradingView Market Data widget | Official embeddable Web Component; free widget and provider-owned market data. It is not a quote API and exposes no app-readable timestamp. TradingView states that equity exchange data in widgets is delayed where exchanges require fees; forex/crypto data may be real time. TSX stocks and indices are listed as delayed. Coverage and timing vary by symbol. | Embedded for US, Canadian and global indices, USD/CAD, gold, and crude oil. We label it as TradingView provider data and tell readers to check the widget for symbol-level timing. We do not scrape or re-publish its data. |
+| TradingView Top Stories | Official embedded news widget, attributed and loaded from TradingView. Headlines and article availability are provided by the widget. | Used as the concise major-market news panel. Existing official Canadian government release feed remains below as a separate source. |
+| TradingView Economic Calendar | Official embedded calendar with country and importance filters. Event/timing information is supplied and rendered by TradingView. | Used for upcoming Canada, US, Europe, UK, Japan, and China macro events. |
+
+All widgets load directly from TradingView in the visitor's browser; they need no API key or server and the frontend remains independently hosted on GitHub Pages. A browser extension or network policy can block them. This is third-party content, and MarketBrief cannot provide a shared quote freshness timestamp for the cross-origin widget.
+
 ## News
 
 | Source | Access and reuse finding | MarketBrief decision |
@@ -19,7 +29,7 @@ For news, the app uses official Canadian Government RSS/Atom stories with public
 
 ### Bank of Canada Valet (connected narrowly)
 
-`FXUSDCAD` reports the daily Bank of Canada USD/CAD reference series. This is a daily published reference observation and the API notes there may be a processing delay. It is not a live forex quote. The frontend makes a small request for the two latest observations and includes the rate date and source attribution. If the browser cannot access the endpoint, the market cards fall back to demo values.
+`FXUSDCAD` reports the daily Bank of Canada USD/CAD reference series. This is a daily published reference observation and the API notes there may be a processing delay. It is not a live forex quote. The frontend makes a small request for the two latest observations and includes the rate date and source attribution. If the browser cannot access the endpoint, TradingView's separate USD/CAD widget remains available; demo market values only appear if the TradingView market widget script fails to load.
 
 ### Alpha Vantage (not connected)
 

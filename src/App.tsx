@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { MarketStrip } from './components/MarketStrip';
 import { StoryCard } from './components/StoryCard';
+import { TradingViewIframeWidget } from './components/TradingViewWidget';
 import { loadState, saveState } from './lib/storage';
 import { CATEGORIES } from './types';
 import type { AppState, Category, Market, ProviderStatus, Story } from './types';
@@ -22,6 +23,7 @@ export default function App() {
   const [query, setQuery] = useState('');
   const [savedOnly, setSavedOnly] = useState(false);
   const [storageNotice, setStorageNotice] = useState(false);
+  const [marketWidgetFailed, setMarketWidgetFailed] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
   useEffect(() => { setStorageNotice(!saveState(state)); }, [state]);
   useEffect(() => {
@@ -74,9 +76,13 @@ export default function App() {
   return <div className="app-shell">
     <aside className="sidebar"><a className="brand" href="#top"><span className="brand-icon">M<span>·</span></span><span>Market<span>Brief</span></span></a><div className="side-label">WORKSPACE</div><nav className="side-nav" aria-label="Dashboard sections"><a className="nav-link current" href="#markets">◫ <span>Market overview</span></a><a className="nav-link" href="#news">▤ <span>News feed</span></a><button className="nav-link" onClick={() => setSavedOnly(!savedOnly)} aria-pressed={savedOnly}>☆ <span>Saved research</span><b>{state.bookmarks.length}</b></button></nav><div className="sidebar-bottom"><div className="local-card"><span className="local-dot"/><div><strong>Local workspace</strong><small>Saved in this browser</small></div></div><p>Notes and bookmarks stay on this device. They do not sync between devices.</p></div></aside>
     <main id="top" className="main"><header className="topbar"><div className="mobile-brand"><span className="brand-icon">M<span>·</span></span> MarketBrief</div><div className="topbar-right"><span className="demo-pill"><i/> {newsStatus.loading ? 'UPDATING FEED' : newsStatus.mode === 'live' ? 'OFFICIAL NEWS' : 'DEMO CONTENT'}</span><span className="date-label">{shortToday}</span><span className="avatar" aria-hidden="true">MB</span></div></header>
-      <div className="content"><div className="welcome"><div><p className="eyebrow">{today.toUpperCase()}</p><h1>Markets, in focus.</h1><p className="welcome-sub">A clear read on the stories moving business and the economy.</p></div><span className="session-status"><i/> {newsStatus.mode === 'live' ? 'OFFICIAL RELEASES' : 'DEMO SESSION'}</span></div>
-        <div className="alert-banner"><span className="alert-mark">!</span><span><strong>Know what you’re reading.</strong> {newsStatus.mode === 'live' ? 'Real headlines from official Canadian government feeds. This is not a broad US or global newswire; coverage is limited to the source feeds shown.' : 'The news list is fictional demo content until the GitHub Actions feed refresh runs. Some market cards may show the Bank of Canada’s daily USD/CAD reference rate; all other figures are illustrative demo values, not live prices.'} Some financial instruments remain demo values and are never shown as live prices.</span></div>
-        <div id="markets"><MarketStrip markets={markets} status={marketStatus} watchlist={state.watchlist} toggleWatch={toggleWatch}/></div>
+      <div className="content"><div className="welcome"><div><p className="eyebrow">{today.toUpperCase()}</p><h1>Markets, in focus.</h1><p className="welcome-sub">A quick read on Canadian, US and global markets, news, and economic events.</p></div><span className="session-status"><i/> THIRD-PARTY WIDGETS</span></div>
+        <div className="alert-banner"><span className="alert-mark">!</span><span><strong>Check each source’s freshness.</strong> TradingView displays its own provider data; equity delays and timestamps vary by market and instrument. MarketBrief does not receive a common widget timestamp. The Bank of Canada rate below is a daily reference. The official Canadian releases feed remains separately attributed.</span></div>
+        <div id="markets"><MarketStrip markets={markets} status={marketStatus} watchlist={state.watchlist} toggleWatch={toggleWatch} widgetFailed={marketWidgetFailed} onWidgetFailure={() => setMarketWidgetFailed(true)}/></div>
+        <section className="intel-grid" aria-label="Market news and upcoming economic events">
+          <article className="intel-panel"><div className="section-heading"><div><p className="eyebrow">MARKET MOVERS</p><h2>Top stories</h2></div><span className="widget-source">TRADINGVIEW</span></div><p className="panel-note">Third-party market news widget. Story timing and availability are supplied by TradingView.</p><TradingViewIframeWidget kind="top-stories"/></article>
+          <article className="intel-panel"><div className="section-heading"><div><p className="eyebrow">WHAT’S AHEAD</p><h2>Economic events</h2></div><span className="widget-source">TRADINGVIEW</span></div><p className="panel-note">Upcoming events for Canada, the US, Europe, UK, Japan, and China. Times shown by the widget.</p><TradingViewIframeWidget kind="economic-calendar"/></article>
+        </section>
         <section id="news" className="news-section"><div className="section-heading news-heading"><div><p className="eyebrow">LATEST INTELLIGENCE</p><h2>{savedOnly ? 'Saved research' : 'The briefing'}</h2></div><span className="story-count">{filtered.length} STORIES</span></div>
           <div className="feed-controls"><label className="search-box"><span aria-hidden="true">⌕</span><input ref={searchRef} type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder="Search headlines and topics…" aria-label="Search headlines and topics"/><kbd>⌘ K</kbd></label><label className="select-wrap"><span className="sr-only">Filter by category</span><select value={category} onChange={event => setCategory(event.target.value as Category | 'All stories')}><option>All stories</option>{CATEGORIES.map(item => <option key={item}>{item}</option>)}</select></label></div>
           <div className="category-pills" aria-label="Filter categories"><button className={category === 'All stories' ? 'chosen' : ''} onClick={() => setCategory('All stories')}>All</button>{CATEGORIES.map(item => <button key={item} className={category === item ? 'chosen' : ''} onClick={() => setCategory(category === item ? 'All stories' : item)}>{item}</button>)}</div>
@@ -87,7 +93,8 @@ export default function App() {
           <div className="feed-footnote">{newsStatus.mode === 'demo' ? 'Fictional demo stories only. Their links are disabled.' : <>Official Government of Canada material reproduced for non-commercial use under <a href="https://www.canada.ca/en/transparency/terms.html" target="_blank" rel="noreferrer">Canada.ca terms</a>. Headlines and descriptions are copied from source feeds, linked to the original, and do not imply government endorsement. GitHub refreshes feeds hourly; news coverage is limited to these official Canadian sources.</>}</div>
         </section>
         {storageNotice && <div className="storage-error" role="status">Browser storage is unavailable or full. Your latest change may not persist after closing this tab.</div>}
-        <footer>MARKETBRIEF <span>·</span> {newsStatus.mode === 'live' ? 'Official Canadian releases' : 'News demo content'} <span>·</span> USD/CAD daily reference attempted; other cards remain demo</footer>
+        <p className="tradingview-link"><a href="https://www.tradingview.com/chart/" target="_blank" rel="noreferrer">Open TradingView for detailed charts and calculations ↗</a></p>
+        <footer>MARKETBRIEF <span>·</span> TradingView market/news/calendar widgets <span>·</span> {newsStatus.mode === 'live' ? 'Official Canadian releases' : 'News demo content'}</footer>
       </div>
     </main>
   </div>;
