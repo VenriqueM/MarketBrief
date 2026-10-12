@@ -2,6 +2,62 @@ import { useEffect, useRef, useState } from 'react';
 
 type EmbedKind = 'top-stories' | 'economic-calendar';
 
+const tickerSymbols = [
+  { proName: 'FOREXCOM:SPXUSD', title: 'S&P 500 CFD' },
+  { proName: 'FOREXCOM:NSXUSD', title: 'US 100 CFD' },
+  { proName: 'TSX:TSX', title: 'S&P/TSX Composite' },
+  { proName: 'FX:USDCAD', title: 'USD/CAD' },
+  { proName: 'TVC:GOLD', title: 'Gold' },
+  { proName: 'TVC:USOIL', title: 'WTI crude oil' },
+];
+
+export function TradingViewTickerTape() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.async = true;
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
+    script.textContent = JSON.stringify({
+      symbols: tickerSymbols,
+      colorTheme: 'dark',
+      isTransparent: false,
+      backgroundColor: '#141619',
+      showSymbolLogo: false,
+      displayMode: 'adaptive',
+      locale: 'en',
+      width: '100%',
+    });
+    script.onerror = () => setFailed(true);
+
+    const widget = document.createElement('div');
+    widget.className = 'tradingview-widget-container__widget';
+    const credit = document.createElement('div');
+    credit.className = 'tradingview-widget-copyright';
+    const link = document.createElement('a');
+    link.href = 'https://www.tradingview.com/markets/';
+    link.target = '_blank';
+    link.rel = 'noopener nofollow noreferrer';
+    link.textContent = 'Market data';
+    credit.append(link, document.createTextNode(' by TradingView'));
+    container.replaceChildren(widget, credit, script);
+
+    return () => container.replaceChildren();
+  }, []);
+
+  return <div className={`ticker-bar ${failed ? 'failed' : ''}`} aria-label="Market data ticker">
+    <div className="ticker-widget tradingview-widget-container" ref={containerRef} aria-label="TradingView market ticker">
+      <span className="ticker-loading">Loading market quotes…</span>
+    </div>
+    {failed && <span className="ticker-error" role="status">Quotes unavailable · <a href="https://www.tradingview.com/markets/" target="_blank" rel="noopener noreferrer">open markets</a></span>}
+  </div>;
+}
+
 const iframeWidgets: Record<EmbedKind, { src: string; href: string; title: string; config: Record<string, unknown> }> = {
   'top-stories': {
     src: 'https://s3.tradingview.com/external-embedding/embed-widget-timeline.js',
