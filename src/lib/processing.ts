@@ -7,13 +7,15 @@ export const ACCEPT_IMAGES = 'image/jpeg,image/png,image/webp,image/gif,image/bm
 function result(blob: Blob, filename: string): ProcessedFile { return { blob, filename }; }
 function stem(name: string) { return name.replace(/\.[^.]+$/, '').replace(/[^\w-]+/g, '-').slice(0, 60) || 'file'; }
 function isImageFile(file: File) { return file.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|bmp)$/i.test(file.name); }
-function checked(files: File[], kind: 'pdf' | 'image') {
+function checked(files: File[], kind: 'pdf' | 'image' | 'text') {
   if (!files.length) throw new Error('Choose at least one file to continue.');
   if (files.some(file => !file.size)) throw new Error('One of the selected files is empty.');
-  if (files.some(file => file.size > LIMIT)) throw new Error('Each file must be smaller than 100 MB.');
-  if (files.some(file => kind === 'pdf' ? file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf') : !isImageFile(file))) {
-    throw new Error(kind === 'pdf' ? 'Choose PDF files only.' : 'Choose supported image files only.');
-  }
+  const limit = kind === 'text' ? 10 * 1024 * 1024 : LIMIT;
+  if (files.some(file => file.size > limit)) throw new Error(kind === 'text' ? 'Text files must be smaller than 10 MB.' : 'Each file must be smaller than 100 MB.');
+  const valid = kind === 'pdf'
+    ? files.every(file => file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'))
+    : kind === 'image' ? files.every(isImageFile) : files.every(file => /\.(txt|md|markdown)$/i.test(file.name) || ['text/plain', 'text/markdown', 'text/x-markdown'].includes(file.type));
+  if (!valid) throw new Error(kind === 'pdf' ? 'Choose PDF files only.' : kind === 'image' ? 'Choose supported image files only.' : 'Choose a .txt or .md file.');
 }
 function checkCancelled(signal?: AbortSignal) { if (signal?.aborted) throw new DOMException('Processing cancelled.', 'AbortError'); }
 async function imageBlob(file: File, type: string, quality: number, width?: number, height?: number, crop?: { x: number; y: number; width: number; height: number }): Promise<Blob> {
@@ -47,8 +49,71 @@ function parseOrder(value: string, count: number): number[] {
 }
 export function formatBytes(size: number) { return size < 1024 * 1024 ? `${Math.max(1, Math.round(size / 1024))} KB` : `${(size / 1024 / 1024).toFixed(1)} MB`; }
 
+async function textFileToPdf(file: File, onProgress: (message: string) => void, signal?: AbortSignal): Promise<ProcessedFile> {
+  const { PDFDocument, StandardFonts } = await import('pdf-lib');
+  onProgress('Reading text file…');
+  const source = await file.text();
+  if (!source.trim()) throw new Error('This text file is empty.');
+  const pdf = await PDFDocument.create();
+  const regular = await pdf.embedFont(StandardFonts.Helvetica); const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
+  const pageSize: [number, number] = [612, 792]; const margin = 54; const maxWidth = pageSize[0] - margin * 2;
+  let page = pdf.addPage(pageSize); let y = pageSize[1] - margin;
+  const addPage = () => { page = pdf.addPage(pageSize); y = pageSize[1] - margin; };
+  const lines = source.replace(/\r\n?/g, '\n').split('\n');
+  for (let index = 0; index < lines.length; index++) {
+    if (signal?.aborted) throw new DOMException('Processing cancelled.', 'AbortError');
+    if (index % 300 === 0) { onProgress(`Formatting text · line ${index + 1} of ${lines.length}…`); await new Promise(resolve => setTimeout(resolve, 0)); }
+    let raw = lines[index]; let font = regular; let size = 11; let gap = 2;
+    const heading = raw.match(/^\s{0,3}(#{1,3})\s+(.+)$/);
+    if (heading) { raw = heading[2]; font = bold; size = heading[1].length === 1 ? 20 : heading[1].length === 2 ? 16 : 13; gap = 7; }
+    else if (/^\s*[-*+]\s+/.test(raw)) raw = `- ${raw.replace(/^\s*[-*+]\s+/, '')}`;
+    else raw = raw.replace(/^(\s*)\d+[.)]\s+/, '$1- ');
+    const words = raw.trim() ? raw.split(/\s+/) : ['']; const wrapped: string[] = []; let current = '';
+    for (const word of words) {
+      const next = current ? `${current} ${word}` : word;
+      try { font.encodeText(next); } catch { throw new Error('This file includes characters outside the basic Latin characters supported by the built-in PDF font.'); }
+      if (current && font.widthOfTextAtSize(next, size) > maxWidth) { wrapped.push(current); current = word; }
+      else current = next;
+    }
+    wrapped.push(current);
+    for (const line of wrapped) {
+      if (y < margin + size + 4) addPage();
+      page.drawText(line, { x: margin, y: y - size, size, font }); y -= size + gap;
+    }
+  }
+  onProgress('Preparing PDF preview…');
+  return { blob: new Blob([await pdf.save()], { type: 'application/pdf' }), filename: `${file.name.replace(/\.(txt|md|markdown)$/i, '') || 'text'}.pdf` };
+}
+
 export async function processFiles(id: ToolId, files: File[], options: ProcessingOptions, onProgress: (message: string) => void, signal?: AbortSignal): Promise<ProcessedFile> {
   checkCancelled(signal);
+  if (id === 'qr') {
+    const text = options.text.trim();
+    if (!text) throw new Error('Enter a link or text for the QR code.');
+    if (text.length > 2048) throw new Error('QR content must be 2,048 characters or fewer.');
+    onProgress('Creating QR code…');
+    const QRCode = (await import('qrcode')).default;
+    const settings = { errorCorrectionLevel: 'M' as const, margin: 2, width: options.qrSize };
+    if (options.qrFormat === 'svg') {
+      const svg = await QRCode.toString(text, { ...settings, type: 'svg' });
+      return { blob: new Blob([svg], { type: 'image/svg+xml' }), filename: 'paperplane-qr.svg', previewBlob: new Blob([svg], { type: 'image/svg+xml' }) };
+    }
+    const data = await QRCode.toDataURL(text, settings);
+    const binary = atob(data.split(',')[1]); const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
+    const image = new Blob([bytes], { type: 'image/png' });
+    return { blob: image, filename: 'paperplane-qr.png', previewBlob: image };
+  }
+  if (id === 'pdf-images') {
+    checked(files, 'pdf');
+    if (files.length !== 1) throw new Error('Choose one PDF at a time.');
+    const { pdfPagesToImages } = await import('./pdfToImages');
+    return pdfPagesToImages(files[0], options.range, options.format as 'image/png' | 'image/jpeg', options.quality, options.renderScale, onProgress, signal);
+  }
+  if (id === 'text-pdf') {
+    checked(files, 'text');
+    if (files.length !== 1) throw new Error('Choose one text or Markdown file at a time.');
+    return textFileToPdf(files[0], onProgress, signal);
+  }
   if (['merge', 'split', 'rotate', 'reorder', 'page-number', 'watermark'].includes(id)) {
     checked(files, 'pdf');
     const { PDFDocument, degrees, StandardFonts, rgb } = await import('pdf-lib');

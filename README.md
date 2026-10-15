@@ -12,6 +12,8 @@ A free, static toolkit for everyday PDF and image tasks. Paperplane is built wit
 - Reorder pages by listing every page exactly once, for example `3, 1, 2`.
 - Add page numbers centered at the bottom of every page, with a chosen starting number.
 - Add an angled, translucent text watermark to every page.
+- Convert `.txt`, `.md`, or `.markdown` files to a printable PDF.
+- Render chosen PDF pages as PNG or JPEG images in a ZIP archive.
 - Convert JPEG, PNG, WebP, GIF, or BMP images to a multi-page PDF.
 
 ### Images
@@ -23,17 +25,28 @@ A free, static toolkit for everyday PDF and image tasks. Paperplane is built wit
 - Crop with original, square, 4:3, 16:9, 3:4, or 9:16 framing and a live crop preview.
 - Convert selected images to PDF.
 
+### Everyday
+
+- Create QR codes from text or links as PNG or SVG.
+- Count whitespace-separated words, grapheme characters, characters without whitespace, and lines.
+- Convert length (m, km, cm, mi, ft, in), mass (kg, g, lb, oz), and temperature (°C, °F, K).
+- Calculate the signed calendar-day difference between two dates.
+
 Each file must be under 100 MB. Large files and high-resolution images may take substantial device memory or time, especially on phones and tablets. The app prepares a local result and shows a preview before the user downloads it. PDF preview uses the browser's built-in PDF viewer; if the viewer is unavailable, download is still available. Actual output size is shown after image encoding.
 
 Image inputs are JPEG, PNG, WebP, GIF, and BMP when the browser can decode them. Outputs are JPEG, PNG, and WebP when the browser can encode them. Animated GIFs are exported as a still image. PNG does not use the quality slider. JPEG output uses the browser canvas and may not preserve image transparency. Crop preview is a centered or slider-positioned rectangular crop; it does not provide freehand selection.
 
-PDF tools support merge, page-range split, rotate, reorder, page numbering, and a text watermark. Page numbers and watermarks are drawn into page content. They are not editable PDF comments or annotations. Watermarks use a built-in standard PDF font, so stick to basic Latin characters for reliable results. Watermark image, drawing, highlighting, and note annotations are not currently included. The app does not try to remove passwords or bypass PDF restrictions.
+PDF text import supports basic Markdown headings and lists; inline Markdown emphasis and links are kept as plain text. Text-to-PDF uses built-in standard PDF fonts and supports their Latin character repertoire, not emoji or arbitrary scripts. PDF-to-image output is limited to 30 selected pages per run; it previews the first image and downloads all chosen pages in one ZIP. Page rendering uses PDF.js locally. Very complex PDFs or PDFs with unusual fonts may fail to render, and high render scales consume more memory. Page numbers and watermarks are drawn into page content, not editable PDF comments. Watermark image, drawing, highlighting, and note annotations are not included. The app does not remove passwords or bypass PDF restrictions.
+
+QR generation is local and supports PNG at 256, 512, or 1024 pixels and scalable SVG. QR content is limited to 2,048 characters. The word counter treats words as whitespace-separated tokens. Character counts use grapheme segmentation when available. The date calculator returns elapsed calendar days (end date minus start date); it does not count both endpoints inclusively. Unit conversion covers the units listed above and is intended for everyday use, not regulated or scientific measurement.
+
+OCR is not included: bundling language models would add large downloads and memory use, while accuracy depends on language, layout, and scan quality. Video-to-audio extraction is also deferred. Browser codec and media-container support varies, and extracting arbitrary video tracks needs a local demux/transcode engine that would be heavy for iPad memory and battery.
 
 ## Privacy and file handling
 
-PDF processing uses `pdf-lib` in the page. Image processing uses browser image decoding, canvas encoding, and object URLs. The app does not send selected file contents to a server, save them to localStorage, or collect analytics or personal information. Temporary source and preview object URLs are revoked when cleared or replaced. Files occupy browser memory while processing and previewing; discard the preview or close the tab when finished to release that memory promptly. Cancellation is checked between files and processing stages; a single large PDF operation or browser canvas encode can temporarily block the page before the next cancellation check.
+PDF editing uses `pdf-lib`; PDF page rendering uses Mozilla PDF.js; QR generation uses `qrcode`; and selected page images are packaged with JSZip. PDF.js is Apache-2.0 licensed; the QR and ZIP packages are MIT licensed. These libraries are bundled for static hosting and run in the visitor's browser. The app does not send selected file contents to a server, save them to localStorage, or collect analytics or personal information. Text counters and calculators also run locally in the current tab. Temporary source and preview object URLs are revoked when cleared or replaced. Files occupy browser memory while processing and previewing; discard the preview or close the tab when finished to release that memory promptly. Cancellation is checked between files and PDF pages; a single PDF page render, PDF encoding operation, or browser canvas encode may temporarily block the page before the next cancellation check.
 
-The app loads its frontend assets from GitHub Pages and uses system fonts. It makes no third-party runtime requests. Once the page and its assets have loaded, file processing can work offline.
+The app loads its frontend assets from GitHub Pages and uses system fonts. It makes no third-party runtime requests. Some larger tool code is lazy-loaded from GitHub Pages when first used; the app has no service worker or guaranteed offline mode.
 
 ## Requirements and local development
 
