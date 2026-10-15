@@ -18,4 +18,5 @@ export const tools: Tool[] = [
   { id: 'word-count', name: 'Word counter', group: 'Everyday', description: 'Count words, characters, and lines locally.', icon: 'Aa' },
   { id: 'unit-converter', name: 'Unit converter', group: 'Everyday', description: 'Convert common length, weight, and temperature units.', icon: '⇄' },
   { id: 'date-calculator', name: 'Date calculator', group: 'Everyday', description: 'Find the number of calendar days between dates.', icon: '▦' },
+  { id: 'video-frame', name: 'Extract video frame', group: 'Media', description: 'Save a still image from a local video at a chosen time.', icon: '▶' },
 ];

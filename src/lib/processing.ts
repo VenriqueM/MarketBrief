@@ -87,6 +87,11 @@ async function textFileToPdf(file: File, onProgress: (message: string) => void, 
 
 export async function processFiles(id: ToolId, files: File[], options: ProcessingOptions, onProgress: (message: string) => void, signal?: AbortSignal): Promise<ProcessedFile> {
   checkCancelled(signal);
+  if (id === 'video-frame') {
+    if (files.length !== 1) throw new Error('Choose one video at a time.');
+    const { videoFrameToJpeg } = await import('./videoFrame');
+    return videoFrameToJpeg(files[0], options.timeSeconds, onProgress, signal);
+  }
   if (id === 'qr') {
     const text = options.text.trim();
     if (!text) throw new Error('Enter a link or text for the QR code.');
